@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한글 탐험가: 서울 이야기 (Hangeul Explorer: Seoul Story)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            overflow-y: auto;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .game-container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.2em;
+            font-weight: 700;
+        }
+
+        .player-info {
+            display: flex;
+            justify-content: space-around;
+            background-color: #e8f0fe;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #34495e;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .player-info span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .player-info span img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #34495e;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #aec6f2;
+            padding-bottom: 5px;
+            text-align: center;
+        }
+
+        .area-selection, .avatar-customization {
+            background-color: #f7f9fc;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .area-buttons, .avatar-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.05em;
+            font-weight: 700;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background-color: #357ABD;
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-area {
+            background-color: #f7f9fc;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .word-display {
+            margin-bottom: 25px;
+        }
+        .word-display h2 {
+            font-size: 3em;
+            color: #2c3e50;
+            margin: 0;
+            cursor: pointer;
+            display: inline-block;
+            transition: color 0.2s ease;
+        }
+        .word-display h2:hover {
+            color: #4a90e2;
+        }
+        .word-display p {
+            font-size: 1.3em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .input-section input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            font-size: 1.2em;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+        .input-section input[type="text"]:focus {
+            border-color: #4a90e2;
+            outline: none;
+        }
+
+        .feedback-message {
+            font-size: 1.2em;
+            margin-top: 10px;
+            height: 1.5em; /* Reserve space */
+            font-weight: 700;
+        }
+        .feedback-message.correct {
+            color: #28a745;
+        }
+        .feedback-message.incorrect {
+            color: #dc3545;
+        }
+
+        .avatar-display {
+            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f7f9fc;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+        .avatar-image-container {
+            width: 150px;
+            height: 200px;
+            margin: 0 auto 15px;
+            position: relative;
+        }
+        .avatar-image-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .info-card {
+            background-color: #eaf1f8;
+            border-left: 5px solid #4a90e2;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.95em;
+            color: #555;
+            line-height: 1.5;
+        }
+        .info-card strong {
+            color: #2c3e50;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+            .game-container {
+                padding: 20px;
+                gap: 20px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            .player-info {
+                font-size: 1em;
+            }
+            .section-title {
+                font-size: 1.3em;
+            }
+            button {
+                padding: 10px 20px;
+                font-size: 0.95em;
+            }
+            .word-display h2 {
+                font-size: 2.5em;
+            }
+            .word-display p {
+                font-size: 1.1em;
+            }
+            .input-section input[type="text"] {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>한글 탐험가: 서울 이야기 🇰🇷</h1>
+
+        <div class="player-info">
+            <span>
+                <img src="https://www.flaticon.com/svg/v2/icons/svg/1828/1828640.svg" alt="XP Icon">
+                XP: <span id="xpDisplay">0</span>
+            </span>
+            <span>
+                <img src="https://www.flaticon.com/svg/v2/icons/svg/2533/2533729.svg" alt="Coin Icon">
+                코인: <span id="coinDisplay">0</span>
+            </span>
+            <span>
+                <img src="https://www.flaticon.com/svg/v2/icons/svg/1179/1179040.svg" alt="Level Icon">
+                레벨: <span id="levelDisplay">1</span>
+            </span>
+        </div>
+
+        <div class="area-selection">
+            <h2 class="section-title">🗺️ 서울 탐험 지역 선택</h2>
+            <div class="area-buttons">
+                <button onclick="selectArea('airport')">🛫 인천 공항 (기초)</button>
+                <button onclick="selectArea('myeongdong')">🛍️ 명동 (쇼핑/음식)</button>
+                <button onclick="selectArea('gyeongbokgung')">🏛️ 경복궁 (역사/문화)</button>
+                <button onclick="selectArea('hongdae')">🎸 홍대 (젊음/예술)</button>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <h2 class="section-title">📝 단어 학습 미션</h2>
+            <div class="word-display" id="wordDisplayArea">
+                <p>지역을 선택하고 단어 학습을 시작하세요!</p>
+            </div>
+
+            <div class="input-section" id="gameInputSection" style="display: none;">
+                <h2 id="koreanWord"></h2>
+                <p id="englishMeaning"></p>
+                <input type="text" id="answerInput" placeholder="단어를 한국어로 입력하세요." autofocus onkeyup="if(event.keyCode===13) checkAnswer();">
+                <p class="feedback-message" id="feedbackMessage"></p>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="playAudio()">🔊 듣기</button>
+                    <button onclick="checkAnswer()">✔️ 정답 확인</button>
+                    <button onclick="nextWord()" id="nextWordButton" style="display: none;">➡️ 다음 단어</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="avatar-customization">
+            <h2 class="section-title">👗 나만의 아바타 꾸미기</h2>
+            <div class="avatar-display">
+                <div class="avatar-image-container">
+                    <img id="avatarBody" src="https://i.imgur.com/vH1WjYl.png" alt="Avatar Body">
+                    <img id="avatarClothes" src="https://i.imgur.com/J3tG21K.png" alt="Avatar Clothes">
+                    <img id="avatarHair" src="https://i.imgur.com/X4yXWfB.png" alt="Avatar Hair">
+                </div>
+            </div>
+            <p style="text-align: center; margin-top: 15px; font-weight: bold;">(코인 10개로 옷/헤어 변경 가능)</p>
+            <div class="avatar-options">
+                <button onclick="changeClothes('https://i.imgur.com/J3tG21K.png', 'casual')">👕 캐주얼</button>
+                <button onclick="changeClothes('https://i.imgur.com/9C0cK4K.png', 'hanbok')">👘 한복</button>
+                <button onclick="changeHair('https://i.imgur.com/X4yXWfB.png', 'short')">💇‍♀️ 단발</button>
+                <button onclick="changeHair('https://i.imgur.com/h5r8w2U.png', 'long')">👩‍🦰 긴 머리</button>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <strong>💡 게임 방법:</strong>
+            <p>1. '서울 탐험 지역 선택'에서 원하는 지역을 선택하세요.</p>
+            <p>2. '단어 학습 미션'에 한국어 단어와 영어 뜻이 표시됩니다. '듣기' 버튼으로 발음을 확인하세요.</p>
+            <p>3. 단어를 한국어로 정확하게 입력하고 '정답 확인'을 누르세요. 맞으면 XP와 코인을 얻습니다!</p>
+            <p>4. 코인을 모아 '나만의 아바타 꾸미기'에서 아바타를 꾸며보세요.</p>
+        </div>
+    </div>
+
+    <script>
+        // --- 게임 데이터 ---
+        const wordPacks = {
+            airport: [
+                { korean: '안녕하세요', english: 'Hello' },
+                { korean: '감사합니다', english: 'Thank you' },
+                { korean: '네', english: 'Yes' },
+                { korean: '아니요', english: 'No' },
+                { korean: '미안합니다', english: 'Sorry' },
+                { korean: '이름', english: 'Name' },
+                { korean: '학생', english: 'Student' },
+                { korean: '한국', english: 'Korea' },
+                { korean: '외국인', english: 'Foreigner' },
+                { korean: '입국', english: 'Entry' }
+            ],
+            myeongdong: [
+                { korean: '얼마예요?', english: 'How much is it?' },
+                { korean: '이거', english: 'This one' },
+                { korean: '저거', english: 'That one (far)' },
+                { korean: '옷', english: 'Clothes' },
+                { korean: '신발', english: 'Shoes' },
+                { korean: '가방', english: 'Bag' },
+                { korean: '예뻐요', english: 'It\'s pretty' },
+                { korean: '깎아주세요', english: 'Please give me a discount' },
+                { korean: '맛있어요', english: 'It\'s delicious' },
+                { korean: '계산', english: 'Payment/Calculation' }
+            ],
+            gyeongbokgung: [
+                { korean: '궁궐', english: 'Palace' },
+                { korean: '왕', english: 'King' },
+                { korean: '한복', english: 'Traditional Korean clothes' },
+                { korean: '역사', english: 'History' },
+                { korean: '문화', english: 'Culture' },
+                { korean: '아름답다', english: 'Beautiful' },
+                { korean: '관광객', english: 'Tourist' },
+                { korean: '옛날', english: 'Old times' },
+                { korean: '사진', english: 'Photo' },
+                { korean: '전통', english: 'Tradition' }
+            ],
+            hongdae: [
+                { korean: '친구', english: 'Friend' },
+                { korean: '버스킹', english: 'Busking' },
+                { korean: '음악', english: 'Music' },
+                { korean: '춤', english: 'Dance' },
+                { korean: '재미있다', english: 'Fun/Interesting' },
+                { korean: '카페', english: 'Cafe' },
+                { korean: '젊음', english: 'Youth' },
+                { korean: '예술', english: 'Art' },
+                { korean: '쇼핑', english: 'Shopping' },
+                { korean: '놀다', english: 'To play/hang out' }
+            ]
+        };
+
+        // --- 게임 상태 변수 ---
+        let currentWordPack = [];
+        let currentWordIndex = 0;
+        let xp = 0;
+        let coins = 0;
+        let level = 1;
+        let utterance = new SpeechSynthesisUtterance(); // 음성 합성 객체
+
+        // --- DOM 요소 ---
+        const xpDisplay = document.getElementById('xpDisplay');
+        const coinDisplay = document.getElementById('coinDisplay');
+        const levelDisplay = document.getElementById('levelDisplay');
+        const koreanWordDisplay = document.getElementById('koreanWord');
+        const englishMeaningDisplay = document.getElementById('englishMeaning');
+        const answerInput = document.getElementById('answerInput');
+        const feedbackMessage = document.getElementById('feedbackMessage');
+        const nextWordButton = document.getElementById('nextWordButton');
+        const gameInputSection = document.getElementById('gameInputSection');
+        const wordDisplayArea = document.getElementById('wordDisplayArea'); // Initial instructions area
+
+        const avatarBody = document.getElementById('avatarBody');
+        const avatarClothes = document.getElementById('avatarClothes');
+        const avatarHair = document.getElementById('avatarHair');
+
+        // --- 게임 초기화 및 UI 업데이트 ---
+        function updateUI() {
+            xpDisplay.textContent = xp;
+            coinDisplay.textContent = coins;
+            levelDisplay.textContent = level;
+            // 레벨업 로직 (예시: 100 XP마다 레벨업)
+            if (xp >= level * 100) {
+                level++;
+                alert(`🎉 레벨업! ${level}레벨이 되었습니다!`);
+                xp = 0; // 레벨업 시 XP 초기화
+            }
+        }
+
+        // --- 지역 선택 및 단어 로드 ---
+        function selectArea(areaName) {
+            currentWordPack = [...wordPacks[areaName]].sort(() => Math.random() - 0.5); // 단어 섞기
+            currentWordIndex = 0;
+            
+            wordDisplayArea.style.display = 'none'; // 초기 설명 숨기기
+            gameInputSection.style.display = 'flex'; // 게임 입력 섹션 보이기
+
+            feedbackMessage.textContent = ''; // 이전 피드백 초기화
+            nextWordButton.style.display = 'none'; // 다음 단어 버튼 숨기기
+            answerInput.value = ''; // 입력창 초기화
+            answerInput.disabled = false; // 입력창 활성화
+            answerInput.focus(); // 입력창에 포커스
+
+            displayWord();
+        }
+
+        // --- 단어 표시 ---
+        function displayWord() {
+            if (currentWordIndex < currentWordPack.length) {
+                const word = currentWordPack[currentWordIndex];
+                koreanWordDisplay.textContent = word.korean;
+                englishMeaningDisplay.textContent = `(${word.english})`;
+                utterance.lang = 'ko-KR'; // 한국어 설정
+                utterance.text = word.korean;
+                utterance.rate = 0.8; // 발음 속도 조절
+                utterance.pitch = 1.0; // 발음 높낮이 조절
+                
+                // 단어 클릭 시 발음 재생
+                koreanWordDisplay.onclick = playAudio;
+            } else {
+                // 모든 단어를 다 학습한 경우
+                koreanWordDisplay.textContent = '🎉 미션 완료!';
+                englishMeaningDisplay.textContent = '모든 단어를 학습했습니다!';
+                gameInputSection.style.display = 'none'; // 입력 섹션 숨기기
+                wordDisplayArea.style.display = 'block'; // 초기 설명 다시 보이게 하여 '미션 완료' 표시
+                wordDisplayArea.innerHTML = `
+                    <h2 class="section-title">📝 단어 학습 미션</h2>
+                    <p style="font-size: 1.5em; font-weight: bold; color: #28a745;">🎉 ${currentWordPack.length}개의 단어 미션 완료!</p>
+                    <p style="font-size: 1.1em; color: #555;">다른 지역을 선택하여 새로운 단어를 배워보세요!</p>
+                `;
+            }
+        }
+
+        // --- 발음 재생 ---
+        function playAudio() {
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel(); // 이미 재생 중이면 중지
+            }
+            speechSynthesis.speak(utterance); // 단어 발음
+        }
+
+        // --- 정답 확인 ---
+        function checkAnswer() {
+            if (answerInput.disabled) return; // 이미 정답 확인이 된 경우 중복 실행 방지
+
+            const userAnswer = answerInput.value.trim();
+            const correctAnswer = currentWordPack[currentWordIndex].korean;
+
+            if (userAnswer === '') {
+                feedbackMessage.textContent = '정답을 입력해주세요!';
+                feedbackMessage.className = 'feedback-message incorrect';
+                return;
+            }
+
+            if (userAnswer === correctAnswer) {
+                feedbackMessage.textContent = '✅ 정답입니다! +10 XP, +5 코인';
+                feedbackMessage.className = 'feedback-message correct';
+                xp += 10;
+                coins += 5;
+            } else {
+                feedbackMessage.textContent = `❌ 틀렸습니다. 정답: ${correctAnswer}`;
+                feedbackMessage.className = 'feedback-message incorrect';
+                xp = Math.max(0, xp - 5); // 오답 시 XP 감소 (최소 0)
+            }
+            updateUI();
+            answerInput.disabled = true; // 정답 확인 후 입력 비활성화
+            nextWordButton.style.display = 'inline-block'; // 다음 단어 버튼 보이기
+            nextWordButton.focus(); // 다음 단어 버튼에 포커스
+        }
+
+        // --- 다음 단어로 이동 ---
+        function nextWord() {
+            currentWordIndex++;
+            feedbackMessage.textContent = '';
+            answerInput.value = '';
+            answerInput.disabled = false;
+            nextWordButton.style.display = 'none';
+            answerInput.focus();
+            displayWord();
+        }
+
+        // --- 아바타 꾸미기 ---
+        const CUSTOMIZE_COST = 10;
+
+        function changeClothes(imageUrl) {
+            if (coins >= CUSTOMIZE_COST) {
+                coins -= CUSTOMIZE_COST;
+                avatarClothes.src = imageUrl;
+                updateUI();
+                alert('👕 옷 변경! -10 코인');
+            } else {
+                alert(`코인이 부족합니다! (필요 코인: ${CUSTOMIZE_COST}, 현재 코인: ${coins})`);
+            }
+        }
+
+        function changeHair(imageUrl) {
+            if (coins >= CUSTOMIZE_COST) {
+                coins -= CUSTOMIZE_COST;
+                avatarHair.src = imageUrl;
+                updateUI();
+                alert('💇‍♀️ 헤어 변경! -10 코인');
+            } else {
+                alert(`코인이 부족합니다! (필요 코인: ${CUSTOMIZE_COST}, 현재 코인: ${coins})`);
+            }
+        }
+
+        // --- 초기 로드 시 UI 업데이트 ---
+        document.addEventListener('DOMContentLoaded', updateUI);
+
+    </script>
+</body>
+</html>
